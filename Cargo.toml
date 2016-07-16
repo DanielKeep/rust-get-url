@@ -1,0 +1,17 @@
+[package]
+name = "get-url"
+version = "0.1.0"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+[dependencies]
+clap = "2.3.0"
+log = "0.3.6"
+
+[replace]
+"winapi:0.2.8" = { git = "https://github.com/DanielKeep/winapi-rs.git", branch = "wininet" }
+
+[target.i686-pc-windows-gnu.dependencies]
+conv = "0.3.3"
+winapi = "0.2.8"
+wininet-sys = { version = "0.1.0", git = "https://github.com/DanielKeep/winapi-rs.git", branch = "wininet" }
+wio = "0.1.1"
