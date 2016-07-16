@@ -5,6 +5,9 @@ use std::convert::AsRef;
 #[cfg(windows)] mod wininet;
 #[cfg(windows)] pub use wininet::{Error, Response};
 
+#[cfg(not(windows))] mod curl;
+#[cfg(not(windows))] pub use curl::{Error, Response};
+
 pub struct Request<'a> {
     url: &'a str,
 }
