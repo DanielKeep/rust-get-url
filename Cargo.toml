@@ -4,8 +4,11 @@ version = "0.1.0"
 authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 
 [dependencies]
-clap = "2.3.0"
 log = "0.3.6"
+
+[dev-dependencies]
+clap = "2.3.0"
+rustc-serialize = "0.3.19"
 
 [replace]
 "winapi:0.2.8" = { git = "https://github.com/DanielKeep/winapi-rs.git", branch = "wininet" }
