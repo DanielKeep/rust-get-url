@@ -8,7 +8,6 @@ use self::conv::prelude::*;
 use self::winapi::*;
 use self::wio::wide::ToWide;
 
-pub const AGENT: &'static str = concat!("get-url/", env!("CARGO_PKG_VERSION"));
 // pub const SCHEMES: &'static [&'static str] = &["http", "https", "ftp"];
 
 pub type Error = io::Error;
@@ -20,7 +19,7 @@ pub struct Response {
 
 impl Response {
     pub fn open(req: ::Request) -> Result<Response, Error> {
-        let inet = try!(internet_open(AGENT));
+        let inet = try!(internet_open(::AGENT));
         let conn = try!(internet_open_url(inet, req.url));
 
         Ok(Response {

@@ -2,6 +2,8 @@
 
 use std::convert::AsRef;
 
+pub const AGENT: &'static str = concat!("get-url/", env!("CARGO_PKG_VERSION"));
+
 #[cfg(windows)] mod wininet;
 #[cfg(windows)] pub use wininet::{Error, Response};
 

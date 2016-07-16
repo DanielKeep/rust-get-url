@@ -12,6 +12,7 @@ impl Response {
     pub fn open(req: ::Request) -> Result<Response, Error> {
         let res = try!(http::handle()
             .get(req.url)
+            .header("User-Agent", ::AGENT)
             .exec());
         let body = io::Cursor::new(res.move_body());
         Ok(Response {
