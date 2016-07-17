@@ -14,6 +14,7 @@ pub const AGENT: &'static str = concat!("get-url/", env!("CARGO_PKG_VERSION"));
 #[cfg(not(windows))] mod curl;
 #[cfg(not(windows))] pub use curl::{Error, Response};
 
+#[derive(Clone, Debug)]
 pub struct Request<'a, 'b> {
     url: &'a str,
     headers: HashMap<Cow<'b, str>, Cow<'b, str>>,
@@ -27,6 +28,10 @@ impl<'a, 'b> Request<'a, 'b> {
                 .cloned()
                 .collect(),
         }
+    }
+
+    pub fn url(&self) -> &str {
+        self.url
     }
 
     pub fn set_header<N, V>(&mut self, name: N, value: V) -> &mut Self
