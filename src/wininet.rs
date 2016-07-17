@@ -126,7 +126,11 @@ where
 fn internet_read_file(file: HINTERNET, buffer: &mut [u8]) -> io::Result<usize> {
     unsafe {
         let buffer_ = buffer.as_ptr() as *mut _;
-        let nobtr = buffer.len().value_into().unwrap_ok();
+        let nobtr = try!(buffer.len()
+            .value_into()
+            .map_err(|_| io::Error::new(
+                io::ErrorKind::Other,
+                "buffer length overflow")));
         let mut nobr = 0;
         match inet::InternetReadFile(file, buffer_, nobtr, &mut nobr) {
             TRUE => Ok(nobr as usize),
