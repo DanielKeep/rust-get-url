@@ -38,13 +38,13 @@ wininet-sys = { version = "0.1.0", git = "https://github.com/DanielKeep/winapi-r
 wio = "0.1.1"
 
 [target.i686-apple-darwin.dependencies]
-curl = "0.2.19"
+curl = "=0.2.18"
 
 [target.x86_64-apple-darwin.dependencies]
-curl = "0.2.19"
+curl = "=0.2.18"
 
 [target.i686-unknown-linux-gnu.dependencies]
-curl = "0.2.19"
+curl = "=0.2.18"
 
 [target.x86_64-unknown-linux-gnu.dependencies]
-curl = "0.2.19"
+curl = "=0.2.18"

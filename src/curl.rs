@@ -10,13 +10,22 @@ pub struct Response {
 
 impl Response {
     pub fn open(req: ::Request) -> Result<Response, Error> {
-        if req.headers.len() != 0 {
-            panic!("NYI: custom headers with curl backend");
+        let mut handle = http::handle();
+        let mut curl_req = handle.get(req.url);
+
+        let mut found_user_agent = false;
+        for (name, value) in &req.headers {
+            if &name[..] == "User-Agent" {
+                found_user_agent = true;
+            }
+            curl_req = curl_req.header(name, value);
         }
-        let res = try!(http::handle()
-            .get(req.url)
-            .header("User-Agent", ::AGENT)
-            .exec());
+        if !found_user_agent {
+            // We have to do this because `curl` *apparently ignores* headers you've already set.
+            curl_req = curl_req.header("User-Agent", ::AGENT);
+        }
+
+        let res = try!(curl_req.exec());
         let body = io::Cursor::new(res.move_body());
         Ok(Response {
             body: body,
