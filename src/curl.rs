@@ -10,6 +10,9 @@ pub struct Response {
 
 impl Response {
     pub fn open(req: ::Request) -> Result<Response, Error> {
+        if req.headers.len() != 0 {
+            panic!("NYI: custom headers with curl backend");
+        }
         let res = try!(http::handle()
             .get(req.url)
             .header("User-Agent", ::AGENT)

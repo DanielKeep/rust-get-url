@@ -2,6 +2,7 @@ extern crate conv;
 extern crate winapi;
 extern crate wininet as inet;
 extern crate wio;
+use std::convert::AsRef;
 use std::io;
 use std::ptr;
 use self::conv::prelude::*;
@@ -18,7 +19,8 @@ pub struct Response {
 impl Response {
     pub fn open(req: ::Request) -> Result<Response, Error> {
         let inet = try!(internet_open(::AGENT));
-        let conn = try!(internet_open_url(inet, req.url));
+        let headers = req.headers.into_iter();
+        let conn = try!(internet_open_url(inet, req.url, headers));
 
         Ok(Response {
             inet: inet,
@@ -69,16 +71,52 @@ where Agent: ToWide {
     }
 }
 
-fn internet_open_url<Url>(internet: HINTERNET, url: Url) -> io::Result<HINTERNET>
-where Url: ToWide {
+fn internet_open_url<Url, HIter, HKey, HValue>(
+    internet: HINTERNET,
+    url: Url,
+    headers: HIter,
+) -> io::Result<HINTERNET>
+where
+    Url: ToWide,
+    HIter: Iterator<Item=(HKey, HValue)>,
+    HKey: AsRef<str>,
+    HValue: AsRef<str>,
+{
     unsafe {
         let url = url.to_wide_null();
         let url = url.as_ptr();
-        let headers = ptr::null();
-        let headers_length = 0;
+        let headers = {
+            if headers.size_hint().1 == Some(0) {
+                None
+            } else {
+                let mut s = vec![];
+                for (k, v) in headers {
+                    macro_rules! push_latin_1 {
+                        ($s:expr) => {
+                            stream_latin_1! {
+                                $s,
+                                |b| s.push(b as u16),
+                                |s| return Err(io::Error::new(
+                                    io::ErrorKind::Other,
+                                    format!("non ISO 8859-1 character \
+                                        in header: {:?}", s)))
+                            }
+                        }
+                    }
+                    push_latin_1!(&k);
+                    s.extend(&[b':' as u16, b' ' as u16]);
+                    push_latin_1!(&v);
+                    s.extend(&[b'\r' as u16, b'\n' as u16]);
+                }
+                s.extend(&[b'\r' as u16, b'\n' as u16]);
+                Some(s)
+            }
+        };
+        let headers_ptr = headers.as_ref().map(|s| s.as_ptr()).unwrap_or(ptr::null());
+        let headers_length = headers.as_ref().map(|s| s.len() as u32).unwrap_or(0);
         let flags = 0;
         let context = 0;
-        match inet::InternetOpenUrlW(internet, url, headers, headers_length, flags, context) {
+        match inet::InternetOpenUrlW(internet, url, headers_ptr, headers_length, flags, context) {
             ptr if ptr.is_null() => Err(io::Error::last_os_error()),
             ptr => Ok(ptr),
         }
