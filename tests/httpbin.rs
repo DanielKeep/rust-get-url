@@ -64,6 +64,20 @@ macro_rules! jps {
 }
 
 #[test]
+fn test_headers() {
+    let agent = format!("{} test_headers", get_url::AGENT);
+    let req = Request::new("https://httpbin.org/headers")
+        .with_header("Accept", "application/json")
+        .with_header("User-Agent", &*agent)
+        .with_header("X-Dummy", "keiichi");
+    let res = get_url_body!(as Json, req);
+
+    assert_eq!(jps!(res, ["headers", "Accept"]), Some("application/json"));
+    assert_eq!(jps!(res, ["headers", "User-Agent"]), Some(&*agent));
+    assert_eq!(jps!(res, ["headers", "X-Dummy"]), Some("keiichi"));
+}
+
+#[test]
 fn test_user_agent() {
     let res = get_url_body!(as Json, "http://httpbin.org/user-agent");
     assert_eq!(jps!(res, ["user-agent"]), Some(get_url::AGENT));
