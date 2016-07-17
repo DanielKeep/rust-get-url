@@ -8,8 +8,6 @@ use self::conv::prelude::*;
 use self::winapi::*;
 use self::wio::wide::ToWide;
 
-// pub const SCHEMES: &'static [&'static str] = &["http", "https", "ftp"];
-
 pub type Error = io::Error;
 
 pub struct Response {
@@ -46,11 +44,6 @@ impl io::Read for Response {
     }
 }
 
-const INTERNET_OPEN_TYPE_PRECONFIG: DWORD = 0;
-// const INTERNET_OPEN_TYPE_DIRECT: DWORD = 1;
-// const INTERNET_OPEN_TYPE_PROXY: DWORD = 3;
-// const INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY: DWORD = 4;
-
 fn internet_close_handle(handle: HINTERNET) -> io::Result<()> {
     unsafe {
         match inet::InternetCloseHandle(handle) {
@@ -65,7 +58,7 @@ where Agent: ToWide {
     unsafe {
         let agent = agent.to_wide_null();
         let agent = agent.as_ptr();
-        let access_type = INTERNET_OPEN_TYPE_PRECONFIG;
+        let access_type = wininet::INTERNET_OPEN_TYPE_PRECONFIG;
         let proxy_name = ptr::null();
         let proxy_bypass = ptr::null();
         let flags = 0;
