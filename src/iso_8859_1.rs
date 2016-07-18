@@ -19,3 +19,15 @@ macro_rules! stream_latin_1 {
         }
     };
 }
+
+macro_rules! push_latin_1 {
+    ($v:expr, $s:expr) => {
+        stream_latin_1! {
+            $s,
+            |b| $v.push(b as u16),
+            |s| return Err(::std::io::Error::new(
+                ::std::io::ErrorKind::Other,
+                format!("non ISO 8859-1 character in header: {:?}", s)))
+        }
+    }
+}

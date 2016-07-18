@@ -64,6 +64,15 @@ macro_rules! jps {
 }
 
 #[test]
+fn test_get() {
+    let res = get_url_body!(as Json, "https://httpbin.org/get?x=1&y=2#f");
+    assert_eq!(jps!(res, ["url"]), Some("https://httpbin.org/get?x=1&y=2"));
+    assert_eq!(jps!(res, ["args", "x"]), Some("1"));
+    assert_eq!(jps!(res, ["args", "y"]), Some("2"));
+    assert_eq!(jps!(res, ["args", "f"]), None);
+}
+
+#[test]
 fn test_headers() {
     let agent = format!("{} test_headers", get_url::AGENT);
     let req = Request::new("https://httpbin.org/headers")
